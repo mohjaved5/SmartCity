@@ -2,8 +2,10 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+/.vs
 /.vs/PSSK_POC/FileContentIndex
 /.vs/ProjectEvaluation
 /.vs/PSSK_POC/config
 /.vs/PSSK_POC
-/PSSK_POC/bin/Debug/netcoreapp3.1
+/PSSK_POC/bin
+/PSSK_POC/obj

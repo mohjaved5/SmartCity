@@ -51,7 +51,18 @@ namespace PSSK_POC.Services
             CreateDatabaseAsync();
             CreateContainerAsync();
 
-            AddItemsToContainerAsync(person).Wait();
+            try
+            {
+                var personProfile = GetUser(person.Email, null);
+                if (personProfile != null)
+                {
+                    UpdateUser(personProfile.Id, person);
+                }
+            }
+            catch (Exception ex) when (ex.Message == "User Not Found")
+            {
+                AddNewUser(person).Wait();
+            }
             return true;
         }
         public PersonResponse GetUser(string email, string userId)
@@ -97,7 +108,7 @@ namespace PSSK_POC.Services
             Console.WriteLine("Created Container: {0}\n", this.container.Id);
         }
 
-        private async Task AddItemsToContainerAsync(PersonRequest person1)
+        private async Task AddNewUser(PersonRequest person1)
         {
             var person = Mapper.Map<PersonResponse>(person1);
             person.Id = Guid.NewGuid().ToString();
@@ -115,6 +126,25 @@ namespace PSSK_POC.Services
                 // Note that after creating the item, we can access the body of the item with the Resource property off the ItemResponse. We can also access the RequestCharge property to see the amount of RUs consumed on this request.
                 Console.WriteLine("Created item in database with id: {0} Operation consumed {1} RUs.\n", andersenFamilyResponse.Resource.Id, andersenFamilyResponse.RequestCharge);
             }
+
+        }
+
+        public void UpdateUser(string userId, PersonRequest person)
+        {
+            // Read the item to see if it exists.  
+            ItemResponse<PersonResponse> user = this.container.ReadItemAsync<PersonResponse>(userId, new PartitionKey(userId)).Result;
+            var itemBody = user.Resource;
+            // update FirstName
+            itemBody.FirstName = person.FirstName;
+            itemBody.LastName = person.LastName;
+            itemBody.DateOfBirth = person.DateOfBirth;
+            itemBody.Nationality = person.Nationality;
+            itemBody.PassportNumber = person.PassportNumber;
+            itemBody.IssueDate = person.IssueDate;
+            itemBody.ExpiryDate = person.ExpiryDate;
+
+            // replace/update the item with the updated content
+            var result = this.container.ReplaceItemAsync<PersonResponse>(itemBody, itemBody.Id, new PartitionKey(itemBody.Id)).Result;
 
         }
 
@@ -164,6 +194,7 @@ namespace PSSK_POC.Services
             }
             return families;
         }
+
         public void MarkDocumentVerificationFalse(string userId)
         {
             // Read the item to see if it exists.  

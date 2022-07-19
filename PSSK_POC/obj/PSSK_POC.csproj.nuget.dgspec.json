@@ -48,6 +48,10 @@
               "target": "Package",
               "version": "[12.13.0, )"
             },
+            "BarCode": {
+              "target": "Package",
+              "version": "[2022.7.7345, )"
+            },
             "Microsoft.Azure.Cosmos": {
               "target": "Package",
               "version": "[3.28.0, )"
