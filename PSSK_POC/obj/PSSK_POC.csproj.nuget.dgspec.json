@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\repos\\PSSK\\PSSK_POC\\PSSK_POC\\PSSK_POC.csproj": {}
+    "C:\\repos\\PSSK1\\PSSK_POC\\PSSK_POC.csproj": {}
   },
   "projects": {
-    "C:\\repos\\PSSK\\PSSK_POC\\PSSK_POC\\PSSK_POC.csproj": {
+    "C:\\repos\\PSSK1\\PSSK_POC\\PSSK_POC.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\repos\\PSSK\\PSSK_POC\\PSSK_POC\\PSSK_POC.csproj",
+        "projectUniqueName": "C:\\repos\\PSSK1\\PSSK_POC\\PSSK_POC.csproj",
         "projectName": "PSSK_POC",
-        "projectPath": "C:\\repos\\PSSK\\PSSK_POC\\PSSK_POC\\PSSK_POC.csproj",
+        "projectPath": "C:\\repos\\PSSK1\\PSSK_POC\\PSSK_POC.csproj",
         "packagesPath": "C:\\Users\\C-RMDAdmin\\.nuget\\packages\\",
-        "outputPath": "C:\\repos\\PSSK\\PSSK_POC\\PSSK_POC\\obj\\",
+        "outputPath": "C:\\repos\\PSSK1\\PSSK_POC\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\C-RMDAdmin\\AppData\\Roaming\\NuGet\\NuGet.Config",
