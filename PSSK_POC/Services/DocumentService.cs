@@ -89,6 +89,8 @@ namespace PSSK_POC.Services
                         {"DocumentTypeId", attachment.DocumentTypeId.ToString()}
                     });
                 }
+
+            //Update isDocumentVerified
             return true;
         }
 
