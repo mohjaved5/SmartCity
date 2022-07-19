@@ -89,6 +89,9 @@ namespace PSSK_POC.Services
                         {"DocumentTypeId", attachment.DocumentTypeId.ToString()}
                     });
                 }
+
+            UserService.MarkDocumentVerificationFalse(attachment.UserId);
+
             return true;
         }
 

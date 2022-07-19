@@ -164,6 +164,17 @@ namespace PSSK_POC.Services
             }
             return families;
         }
+        public void MarkDocumentVerificationFalse(string userId)
+        {
+            // Read the item to see if it exists.  
+            ItemResponse<PersonResponse> user = this.container.ReadItemAsync<PersonResponse>(userId, new PartitionKey(userId)).Result;
+            var itemBody = user.Resource;
+            // update FirstName
+            itemBody.IsDocumentReviewed = false;
 
+            // replace/update the item with the updated content
+            var result = this.container.ReplaceItemAsync<PersonResponse>(itemBody, itemBody.Id, new PartitionKey(itemBody.Id)).Result;
+
+        }
     }
 }
