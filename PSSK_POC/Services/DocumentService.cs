@@ -90,7 +90,8 @@ namespace PSSK_POC.Services
                     });
                 }
 
-            //Update isDocumentVerified
+            UserService.MarkDocumentVerificationFalse(attachment.UserId);
+
             return true;
         }
 
