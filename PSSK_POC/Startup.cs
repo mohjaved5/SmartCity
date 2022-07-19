@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PSSK_POC.Common;
+using PSSK_POC.Contracts;
 using PSSK_POC.Services;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace PSSK_POC
             services.AddScoped<UserService>();
             services.AddScoped<DocumentService>();
             services.AddScoped<HttpClient>();
+            services.AddTransient<IQRCodeService, QRCodeService>();
 
             services.AddControllers();
             services.AddSwaggerGen(options =>
