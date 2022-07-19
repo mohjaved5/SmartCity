@@ -4,6 +4,7 @@ using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Azure.Cosmos;
+using PSSK_POC.Contracts;
 using PSSK_POC.Models;
 using System;
 using System.Collections.Generic;
@@ -30,10 +31,12 @@ namespace PSSK_POC.Services
         private readonly string documentTypeContainerId = "documentTypes";
         private readonly string approverTypeContainerId = "approverTypes";
         private static string _connectionString = "DefaultEndpointsProtocol=https;AccountName=pssk;AccountKey=3Bp0YmwfQyRpw6IZ8g1lTVv7dTUU2FlpR5vKOv+q84cuWAlzUiex1y7ZGbWAKS4IwedMKlDkweHa+AStRJ4DpQ==;EndpointSuffix=core.windows.net";
-
-        public DocumentService(UserService userService)
+        private readonly IQRCodeService _qRCodeService;
+        public DocumentService(UserService userService,
+            IQRCodeService qRCodeService)
         {
             UserService = userService;
+            _qRCodeService = qRCodeService;
         }
 
         public UserService UserService { get; }
@@ -196,6 +199,25 @@ namespace PSSK_POC.Services
                     metadata["Status"] = review.StatusId.ToString();
                     blobClient.SetMetadata(metadata);
                 }
+            }
+            // Generate QR Code for user if all documents are approved
+            if(CheckAllDocumentsApproved(review.UserId))
+            {
+                var userDetailsJson = Newtonsoft.Json.JsonConvert.SerializeObject(user);
+                var qrCodeImage = _qRCodeService.GetQRCode(userDetailsJson);
+
+                // update the qr code image for user
+                UserService.UpdateQRCodeAndDocumentReviewedStatus(user.Id, qrCodeImage);
+            }
+            return true;
+        }
+
+        private bool CheckAllDocumentsApproved(string userId)
+        {
+            var allDocumentsList = ListDocument(userId);
+            if (allDocumentsList.Any(x => !string.Equals(x.Status, DocumentStatus.Approved.ToString())))
+            {
+                return false;
             }
             return true;
         }
