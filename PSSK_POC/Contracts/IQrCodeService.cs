@@ -2,6 +2,6 @@
 {
     public interface IQRCodeService
     {
-
+        string GetQRCode(string data);
     }
 }
