@@ -115,7 +115,7 @@ namespace PSSK_POC.Services
             return containerClient;
         }
 
-        public List<AttachmentResponse> ListDocument(string userId)
+        public List<AttachmentResponse> ListDocument(string userId, bool returnBase64 = true)
         {
             List<AttachmentResponse> image = new List<AttachmentResponse>();
             var user = UserService.GetUser(null, userId);
@@ -134,15 +134,19 @@ namespace PSSK_POC.Services
                 BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
                 if (blobClient.ExistsAsync().Result)
                 {
-                    var response = blobClient.DownloadStreamingAsync().Result;
+                    string document = string.Empty;
+                    if (returnBase64)
+                    {
+                        var response = blobClient.DownloadStreamingAsync().Result;
 
-                    using var sr = new StreamReader(response.Value.Content);
-                    using MemoryStream ms = new MemoryStream();
+                        using var sr = new StreamReader(response.Value.Content);
+                        using MemoryStream ms = new MemoryStream();
 
-                    sr.BaseStream.CopyTo(ms);
-                    var b64String = Convert.ToBase64String(ms.ToArray());
-                    new FileExtensionContentTypeProvider().TryGetContentType(blobItem.Name, out string contentType);
-
+                        sr.BaseStream.CopyTo(ms);
+                        var b64String = Convert.ToBase64String(ms.ToArray());
+                        new FileExtensionContentTypeProvider().TryGetContentType(blobItem.Name, out string contentType);
+                        document = $"data:{contentType};base64," + b64String;
+                    }
                     image.Add(new AttachmentResponse()
                     {
                         Id = blobItem.Metadata.ContainsKey("Id") ? blobItem.Metadata["Id"] : string.Empty,
@@ -154,7 +158,7 @@ namespace PSSK_POC.Services
                         Url = blobClient.Uri.AbsoluteUri,
                         StatusId = blobItem.Metadata.ContainsKey("Status") ? Convert.ToInt32(blobItem.Metadata["Status"]) : 0,
                         Status = ((DocumentStatus)Convert.ToInt32(blobItem.Metadata["Status"])).ToString(),
-                        Document = $"data:{contentType};base64," + b64String
+                        Document = document
                     }); ;
                 }
             }
@@ -200,8 +204,9 @@ namespace PSSK_POC.Services
                     blobClient.SetMetadata(metadata);
                 }
             }
+
             // Generate QR Code for user if all documents are approved
-            if(CheckAllDocumentsApproved(review.UserId))
+            if (CheckAllDocumentsApproved(review.UserId))
             {
                 var userDetailsJson = Newtonsoft.Json.JsonConvert.SerializeObject(user);
                 var qrCodeImage = _qRCodeService.GetQRCode(userDetailsJson);
@@ -213,16 +218,18 @@ namespace PSSK_POC.Services
             {
                 UserService.UpdateQRCodeAndDocumentReviewedStatus(user.Id, null, false);
             }
+            else
+                UserService.MarkDocumentVerificationFalse(review.UserId);
+
             return true;
         }
 
         private bool CheckAllDocumentsApproved(string userId)
         {
-            var allDocumentsList = ListDocument(userId);
+            var allDocumentsList = ListDocument(userId, false);
             if (allDocumentsList.Count == 0 || allDocumentsList.Any(x => !string.Equals(x.Status, DocumentStatus.Approved.ToString())))
-            {
                 return false;
-            }
+
             return true;
         }
 
@@ -286,12 +293,14 @@ namespace PSSK_POC.Services
             this.container = this.database.CreateContainerIfNotExistsAsync(documentTypeContainerId, "/id").Result;
             Console.WriteLine("Created Container: {0}\n", this.container.Id);
         }
+
         private void CreateApproverContainerAsync()
         {
             // Create a new container
             this.container = this.database.CreateContainerIfNotExistsAsync(approverTypeContainerId, "/id").Result;
             Console.WriteLine("Created Container: {0}\n", this.container.Id);
         }
+
         private List<DocumentTypes> GetDocumentTypeList()
         {
             var sqlQueryText = string.Empty;
@@ -312,6 +321,7 @@ namespace PSSK_POC.Services
             }
             return families;
         }
+
         private List<ApproverTypes> GetApproverTypeList()
         {
             var sqlQueryText = string.Empty;
