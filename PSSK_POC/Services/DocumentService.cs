@@ -218,8 +218,7 @@ namespace PSSK_POC.Services
             {
                 UserService.UpdateQRCodeAndDocumentReviewedStatus(user.Id, null, false);
             }
-            else
-                UserService.MarkDocumentVerificationFalse(review.UserId);
+            
 
             return true;
         }
