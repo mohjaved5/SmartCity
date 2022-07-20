@@ -208,14 +208,14 @@ namespace PSSK_POC.Services
 
         }
 
-        public void UpdateQRCodeAndDocumentReviewedStatus(string userId, string qrCode)
+        public void UpdateQRCodeAndDocumentReviewedStatus(string userId, string qrCode, bool isDocumentReviewed)
         {
             // Read the item to see if it exists.  
             ItemResponse<PersonResponse> user = this.container.ReadItemAsync<PersonResponse>(userId, new PartitionKey(userId)).Result;
             var itemBody = user.Resource;
             // update FirstName
             itemBody.QRCode = qrCode;
-            itemBody.IsDocumentReviewed = true;
+            itemBody.IsDocumentReviewed = isDocumentReviewed;
 
             // replace/update the item with the updated content
             var result = this.container.ReplaceItemAsync<PersonResponse>(itemBody, itemBody.Id, new PartitionKey(itemBody.Id)).Result;

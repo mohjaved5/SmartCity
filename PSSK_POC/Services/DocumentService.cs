@@ -207,7 +207,11 @@ namespace PSSK_POC.Services
                 var qrCodeImage = _qRCodeService.GetQRCode(userDetailsJson);
 
                 // update the qr code image for user
-                UserService.UpdateQRCodeAndDocumentReviewedStatus(user.Id, qrCodeImage);
+                UserService.UpdateQRCodeAndDocumentReviewedStatus(user.Id, qrCodeImage, true);
+            }
+            else
+            {
+                UserService.UpdateQRCodeAndDocumentReviewedStatus(user.Id, null, false);
             }
             return true;
         }
@@ -215,7 +219,7 @@ namespace PSSK_POC.Services
         private bool CheckAllDocumentsApproved(string userId)
         {
             var allDocumentsList = ListDocument(userId);
-            if (allDocumentsList.Any(x => !string.Equals(x.Status, DocumentStatus.Approved.ToString())))
+            if (allDocumentsList.Count == 0 || allDocumentsList.Any(x => !string.Equals(x.Status, DocumentStatus.Approved.ToString())))
             {
                 return false;
             }
