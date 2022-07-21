@@ -34,8 +34,8 @@ namespace PSSK_POC
             services.AddScoped<UserService>();
             services.AddScoped<DocumentService>();
             services.AddScoped<HttpClient>();
-            services.AddTransient<IQRCodeService, QRCodeService>();
-
+            services.AddTransient<IQRCodeService, QRCodeService>(); 
+            services.AddSingleton<IConfiguration>(Configuration);
             services.AddControllers();
             services.AddSwaggerGen(options =>
             {

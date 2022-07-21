@@ -4,6 +4,7 @@ using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
 using PSSK_POC.Contracts;
 using PSSK_POC.Models;
 using System;
@@ -32,11 +33,14 @@ namespace PSSK_POC.Services
         private readonly string approverTypeContainerId = "approverTypes";
         private static string _connectionString = "DefaultEndpointsProtocol=https;AccountName=pssk;AccountKey=3Bp0YmwfQyRpw6IZ8g1lTVv7dTUU2FlpR5vKOv+q84cuWAlzUiex1y7ZGbWAKS4IwedMKlDkweHa+AStRJ4DpQ==;EndpointSuffix=core.windows.net";
         private readonly IQRCodeService _qRCodeService;
+        private IConfiguration _configuration;
         public DocumentService(UserService userService,
-            IQRCodeService qRCodeService)
+            IQRCodeService qRCodeService,
+            IConfiguration configuration)
         {
             UserService = userService;
             _qRCodeService = qRCodeService;
+            _configuration = configuration;
         }
 
         public UserService UserService { get; }
@@ -206,7 +210,7 @@ namespace PSSK_POC.Services
             }
 
             // Generate QR Code for user if all documents are approved
-            if (CheckAllDocumentsApproved(review.UserId))
+            if (CheckMandatoryDocumentsApproved(review.UserId))
             {
                 var userDetailsJson = Newtonsoft.Json.JsonConvert.SerializeObject(user);
                 var qrCodeImage = _qRCodeService.GetQRCode(userDetailsJson);
@@ -223,10 +227,19 @@ namespace PSSK_POC.Services
             return true;
         }
 
-        private bool CheckAllDocumentsApproved(string userId)
+        private bool CheckMandatoryDocumentsApproved(string userId)
         {
             var allDocumentsList = ListDocument(userId, false);
-            if (allDocumentsList.Count == 0 || allDocumentsList.Any(x => !string.Equals(x.Status, DocumentStatus.Approved.ToString())))
+            var mandatoryDocumentsTypeIds = _configuration.GetSection("ApplicationSettings").GetSection("MandatoryDocumentTypes").Value.Split(',');
+
+            // Check if all mandatory documents are uploaded
+            if(mandatoryDocumentsTypeIds.Except(allDocumentsList.Select(x => x.DocumentTypeId.ToString())).Any())
+            {
+                return false;
+            }
+
+            // Check if all mandatory documents are approved
+            if (allDocumentsList.Any(x => mandatoryDocumentsTypeIds.Contains(x.DocumentTypeId.ToString()) && !string.Equals(x.Status, DocumentStatus.Approved.ToString())))
                 return false;
 
             return true;
