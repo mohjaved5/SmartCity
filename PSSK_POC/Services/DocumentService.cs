@@ -102,6 +102,25 @@ namespace PSSK_POC.Services
             return true;
         }
 
+        public bool DeleteDocument(string userId, string documentName)
+        {
+            var user = UserService.GetUser(null, userId);
+            if (user == null)
+                throw new Exception("User not found");
+
+            var containerName = user.Id;
+            var containerClient = GetContainerClient(out BlobServiceClient blobServiceClient, containerName);
+
+            var blobs = containerClient.GetBlobs(BlobTraits.All, prefix:documentName);
+            if (!blobs.Any())
+                throw new Exception("Document not found");
+            
+            BlobClient blobClient = containerClient.GetBlobClient(documentName);
+            blobClient.Delete();
+
+            return true;
+        }
+
         private BlobContainerClient GetContainerClient(out BlobServiceClient blobServiceClient, string containerName)
         {
             BlobContainerClient containerClient;
