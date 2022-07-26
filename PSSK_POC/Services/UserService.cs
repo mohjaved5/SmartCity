@@ -24,6 +24,7 @@ namespace PSSK_POC.Services
         // The name of the database and container we will create
         private readonly string databaseId = "pssk";
         private readonly string containerId = "users";
+        private readonly string nationalityContainerId = "nationalities";
 
 
         public AuthenticationService AuthenticationService { get; }
@@ -65,12 +66,21 @@ namespace PSSK_POC.Services
             }
             return true;
         }
-        public PersonResponse GetUser(string email, string userId)
+        public PersonResponse GetUser(string email, string userId, string authUserId = null)
         {
             GetClient();
             CreateDatabaseAsync();
             CreateContainerAsync();
-            var response = GetUserDetails(email, userId);
+            var response = GetUserDetails(email, userId, authUserId);
+
+            return response;
+        }
+        public List<NationalityResponse> GetNationalities()
+        {
+            GetClient();
+            CreateDatabaseAsync();
+            CreateNationalityContainerAsync();
+            var response = GetNationalitiesList();
 
             return response;
         }
@@ -105,6 +115,13 @@ namespace PSSK_POC.Services
         {
             // Create a new container
             this.container = this.database.CreateContainerIfNotExistsAsync(containerId, "/id").Result;
+            Console.WriteLine("Created Container: {0}\n", this.container.Id);
+        }
+
+        private void CreateNationalityContainerAsync()
+        {
+            // Create a new container
+            this.container = this.database.CreateContainerIfNotExistsAsync(nationalityContainerId, "/id").Result;
             Console.WriteLine("Created Container: {0}\n", this.container.Id);
         }
 
@@ -148,13 +165,16 @@ namespace PSSK_POC.Services
 
         }
 
-        private PersonResponse GetUserDetails(string email, string userId)
+        private PersonResponse GetUserDetails(string email, string userId, string authUserId)
         {
             var sqlQueryText = string.Empty;
-            if (string.IsNullOrEmpty(userId))
+            if (!string.IsNullOrEmpty(email))
                 sqlQueryText = $"SELECT * FROM items where items.Email='{email}'";
-            else
+            else if (!string.IsNullOrEmpty(userId))
                 sqlQueryText = $"SELECT * FROM items where items.id='{userId}'";
+            else
+                sqlQueryText = $"SELECT * FROM items where items.AuthUserid='{authUserId}'";
+
 
             QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
             using FeedIterator<PersonResponse> queryResultSetIterator = this.container.GetItemQueryIterator<PersonResponse>(queryDefinition);
@@ -188,6 +208,27 @@ namespace PSSK_POC.Services
             {
                 FeedResponse<PersonResponse> currentResultSet = queryResultSetIterator.ReadNextAsync().Result;
                 foreach (PersonResponse family in currentResultSet)
+                {
+                    families.Add(family);
+                }
+            }
+            return families;
+        }
+
+        private List<NationalityResponse> GetNationalitiesList()
+        {
+            var sqlQueryText = string.Empty;
+            sqlQueryText = $"SELECT i.id, i[\"Value\"] FROM items i";
+
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+            using FeedIterator<NationalityResponse> queryResultSetIterator = this.container.GetItemQueryIterator<NationalityResponse>(queryDefinition);
+
+            List<NationalityResponse> families = new List<NationalityResponse>();
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<NationalityResponse> currentResultSet = queryResultSetIterator.ReadNextAsync().Result;
+                foreach (NationalityResponse family in currentResultSet)
                 {
                     families.Add(family);
                 }
