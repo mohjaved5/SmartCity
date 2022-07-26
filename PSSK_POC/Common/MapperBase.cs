@@ -16,6 +16,7 @@ namespace PSSK_POC.Common
         {
 
             CreateMap<PersonRequest, PersonResponse>();
+            CreateMap<ProfileResponseAuth0, ProfileResponse>();
         }
 
     }

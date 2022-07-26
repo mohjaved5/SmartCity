@@ -12,6 +12,7 @@ C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\AutoMapper.Extensio
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Azure.Core.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Azure.Storage.Blobs.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Azure.Storage.Common.dll
+C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\IronBarCode.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Azure.Cosmos.Client.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Azure.Cosmos.Core.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Azure.Cosmos.Direct.dll
@@ -19,11 +20,13 @@ C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Azure.Cos
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Bcl.AsyncInterfaces.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Bcl.HashCode.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.OpenApi.dll
+C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Newtonsoft.Json.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\System.Configuration.ConfigurationManager.dll
+C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\System.Drawing.Common.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\System.IO.Hashing.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\System.Memory.Data.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\System.Security.Cryptography.ProtectedData.dll
@@ -31,4 +34,7 @@ C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\System.Text.Encodin
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\System.Text.Json.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\runtimes\win-x64\native\Cosmos.CRTCompat.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\runtimes\win-x64\native\Microsoft.Azure.Cosmos.ServiceInterop.dll
+C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PubTmp\Out\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll

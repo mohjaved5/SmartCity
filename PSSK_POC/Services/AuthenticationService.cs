@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AutoMapper;
+using Newtonsoft.Json;
 using PSSK_POC.Models;
 using System;
 using System.Collections.Generic;
@@ -16,10 +17,12 @@ namespace PSSK_POC.Services
         readonly string audience = "https://dev-c1w9u7zc.jp.auth0.com/api/v2/";
         readonly string connection = "TestConnection";
         readonly string redirectUrl = "{RedirectUrl}";
+        private readonly IMapper mapper;
 
-        public AuthenticationService(HttpClient httpClient)
+        public AuthenticationService(HttpClient httpClient, IMapper mapper)
         {
             HttpClient = httpClient;
+            this.mapper = mapper;
         }
 
         public HttpClient HttpClient { get; }
@@ -72,7 +75,9 @@ namespace PSSK_POC.Services
                 var a = response.Content.ReadAsStringAsync().Result;
                 return new ProfileResponse();
             }
-            ProfileResponse result = JsonConvert.DeserializeObject<ProfileResponse>(response.Content.ReadAsStringAsync().Result);
+            var result1 = JsonConvert.DeserializeObject<ProfileResponseAuth0>(response.Content.ReadAsStringAsync().Result);
+            var result = mapper.Map<ProfileResponse>(result1);
+            result.username = result1.nickname;
             return result;
         }
 

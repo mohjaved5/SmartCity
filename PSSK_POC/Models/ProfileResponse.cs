@@ -9,8 +9,18 @@ namespace PSSK_POC.Models
     {
         public string sub { get; set; }
         public bool email_verified { get; set; }
+        public string username { get; set; }
         public string email { get; set; }
-        public string name { get; set; }
-        public UserMetadata User_Metadata { get; set; }
+        public string given_name { get; set; }
+        public string family_name { get; set; }
+    }
+    public class ProfileResponseAuth0
+    {
+        public string sub { get; set; }
+        public bool email_verified { get; set; }
+        public string nickname { get; set; }
+        public string email { get; set; }
+        public string given_name { get; set; }
+        public string family_name { get; set; }
     }
 }
