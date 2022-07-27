@@ -16,7 +16,7 @@ namespace PSSK_POC.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-       
+
         public UserController(UserService userService)
         {
             UserService = userService;
@@ -32,14 +32,21 @@ namespace PSSK_POC.Controllers
         }
 
         [HttpGet]
-        public PersonResponse GetUser(string email, string userId)
+        public PersonResponse GetUser(string email, string userId, string authUserId)
         {
-            return UserService.GetUser(email, userId);
+            return UserService.GetUser(email, userId, authUserId);
         }
+        
         [HttpGet("List")]
         public List<PersonResponse> GetUserList()
         {
             return UserService.GetUsers();
+        }
+        
+        [HttpGet("Nationalities")]
+        public List<NationalityResponse> GetNationalities()
+        {
+            return UserService.GetNationalities();
         }
 
     }

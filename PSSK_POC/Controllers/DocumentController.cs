@@ -44,6 +44,12 @@ namespace PSSK_POC.Controllers
             return DocumentService.UploadDocument(attachment);
         }
 
+        [HttpDelete("Delete")]
+        public bool DeleteDocument(string userId, string documentName)
+        {
+            return DocumentService.DeleteDocument(userId, documentName);
+        }
+
         [HttpGet]
         public List<AttachmentResponse> ListDocument(string userId)
         {
@@ -55,9 +61,9 @@ namespace PSSK_POC.Controllers
         {
             return DocumentService.GetDocumentUrl(documentName, userId);
         }
-        
+
         [HttpPost("Review")]
-        public bool ReviewDocument([FromBody]DocumentReview review)
+        public bool ReviewDocument([FromBody] DocumentReview review)
         {
             return DocumentService.ValidateDocument(review);
         }
