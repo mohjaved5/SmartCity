@@ -85,6 +85,19 @@ namespace PSSK_POC.Services
             return response;
         }
 
+        public string GetQRCode(string userId)
+        {
+            GetClient();
+            CreateDatabaseAsync();
+            CreateContainerAsync();
+            var response = GetQRCodeImage(userId);
+
+            if (response != null)
+                return response.QRCode;
+            else
+                return null;
+        }
+
         public List<PersonResponse> GetUsers()
         {
             GetClient();
@@ -191,6 +204,25 @@ namespace PSSK_POC.Services
             }
             if (!families.Any())
                 throw new Exception("User Not Found");
+            return families.FirstOrDefault();
+        }
+
+        private QRCodeResponse GetQRCodeImage(string userId)
+        {
+            var sqlQueryText = $"SELECT i.QRCode FROM items i where i.Email='{userId}'";
+
+            List<QRCodeResponse> families = new List<QRCodeResponse>();
+
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+            using FeedIterator<QRCodeResponse> queryResultSetIterator = this.container.GetItemQueryIterator<QRCodeResponse>(queryDefinition);
+            if(queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<QRCodeResponse> currentResultSet = queryResultSetIterator.ReadNextAsync().Result;
+                foreach (var family in currentResultSet)
+                {
+                    families.Add(family);
+                }
+            }
             return families.FirstOrDefault();
         }
 
