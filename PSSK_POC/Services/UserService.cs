@@ -209,7 +209,7 @@ namespace PSSK_POC.Services
 
         private QRCodeResponse GetQRCodeImage(string userId)
         {
-            var sqlQueryText = $"SELECT i.QRCode FROM items i where i.Email='{userId}'";
+            var sqlQueryText = $"SELECT i.QRCode FROM items i where i.id='{userId}'";
 
             List<QRCodeResponse> families = new List<QRCodeResponse>();
 
