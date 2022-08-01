@@ -92,3 +92,9 @@ C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PSSK_POC.csproj.CopyComplete
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PSSK_POC.dll
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PSSK_POC.pdb
 C:\repos\PSSK1\PSSK_POC\obj\Release\netcoreapp3.1\PSSK_POC.genruntimeconfig.cache
+C:\repos\PSSK1\PSSK_POC\bin\Release\netcoreapp3.1\IronBarCode.dll
+C:\repos\PSSK1\PSSK_POC\bin\Release\netcoreapp3.1\Microsoft.Win32.SystemEvents.dll
+C:\repos\PSSK1\PSSK_POC\bin\Release\netcoreapp3.1\System.Drawing.Common.dll
+C:\repos\PSSK1\PSSK_POC\bin\Release\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+C:\repos\PSSK1\PSSK_POC\bin\Release\netcoreapp3.1\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\repos\PSSK1\PSSK_POC\bin\Release\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll

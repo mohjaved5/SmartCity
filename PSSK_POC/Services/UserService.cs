@@ -88,8 +88,8 @@ namespace PSSK_POC.Services
         public string GetQRCode(string userId)
         {
             GetClient();
-            CreateDatabaseAsync();
-            CreateContainerAsync();
+            GetDatabase();
+            GetContainer();
             var response = GetQRCodeImage(userId);
 
             if (response != null)
@@ -213,7 +213,7 @@ namespace PSSK_POC.Services
 
             QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
             using FeedIterator<QRCodeResponse> queryResultSetIterator = this.container.GetItemQueryIterator<QRCodeResponse>(queryDefinition);
-            if(queryResultSetIterator.HasMoreResults)
+            if (queryResultSetIterator.HasMoreResults)
             {
                 FeedResponse<QRCodeResponse> currentResultSet = queryResultSetIterator.ReadNextAsync().Result;
                 foreach (var family in currentResultSet)
