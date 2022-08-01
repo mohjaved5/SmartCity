@@ -111,10 +111,10 @@ namespace PSSK_POC.Services
             var containerName = user.Id;
             var containerClient = GetContainerClient(out BlobServiceClient blobServiceClient, containerName);
 
-            var blobs = containerClient.GetBlobs(BlobTraits.All, prefix:documentName);
+            var blobs = containerClient.GetBlobs(BlobTraits.All, prefix: documentName);
             if (!blobs.Any())
                 throw new Exception("Document not found");
-            
+
             BlobClient blobClient = containerClient.GetBlobClient(documentName);
             blobClient.Delete();
 
@@ -138,7 +138,7 @@ namespace PSSK_POC.Services
             return containerClient;
         }
 
-        public List<AttachmentResponse> ListDocument(string userId, bool returnBase64 = true)
+        public List<AttachmentResponse> ListDocument(string userId, int approverTypeId, bool returnBase64 = true)
         {
             List<AttachmentResponse> image = new List<AttachmentResponse>();
             var user = UserService.GetUser(null, userId);
@@ -146,8 +146,12 @@ namespace PSSK_POC.Services
                 throw new Exception("User not found");
 
             var containerName = user.Id;
+            List<DocumentTypes> documentTypes;
 
-            var documentTypes = GetDocumentTypes();
+            if (approverTypeId == 0)
+                documentTypes = GetDocumentTypes();
+            else
+                documentTypes = GetDocumentTypes().Where(d => d.ApproverTypeId == approverTypeId).ToList();
 
             var containerClient = GetContainerClient(out BlobServiceClient blobServiceClient, containerName);
 
@@ -157,36 +161,64 @@ namespace PSSK_POC.Services
                 BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
                 if (blobClient.ExistsAsync().Result)
                 {
+                    int docTypeId = Convert.ToInt32(blobItem.Metadata["documentTypeId"].ToString());
                     string document = string.Empty;
-                    if (returnBase64)
+                    if (documentTypes.Select(d => d.Id).ToList().Contains(docTypeId))
                     {
-                        var response = blobClient.DownloadStreamingAsync().Result;
-
-                        using var sr = new StreamReader(response.Value.Content);
-                        using MemoryStream ms = new MemoryStream();
-
-                        sr.BaseStream.CopyTo(ms);
-                        var b64String = Convert.ToBase64String(ms.ToArray());
-                        new FileExtensionContentTypeProvider().TryGetContentType(blobItem.Name, out string contentType);
-                        document = $"data:{contentType};base64," + b64String;
+                        if (returnBase64)
+                        {
+                            document = GetDocumentBase64(blobItem, blobClient, out StreamReader sr, out MemoryStream ms);
+                        }
+                        image.Add(new AttachmentResponse()
+                        {
+                            Id = blobItem.Metadata.ContainsKey("Id") ? blobItem.Metadata["Id"] : string.Empty,
+                            Name = blobItem.Name,
+                            FileExtension = blobItem.Metadata.ContainsKey("FileExtension") ? blobItem.Metadata["FileExtension"] : string.Empty,
+                            DisplayName = blobItem.Metadata.ContainsKey("DisplayName") ? blobItem.Metadata["DisplayName"] : string.Empty,
+                            DocumentTypeId = blobItem.Metadata.ContainsKey("DocumentTypeId") ? Convert.ToInt32(blobItem.Metadata["DocumentTypeId"].ToString()) : 0,
+                            DocumentType = documentTypes.FirstOrDefault(d => d.Id == Convert.ToInt32(blobItem.Metadata["DocumentTypeId"].ToString())),
+                            Url = blobClient.Uri.AbsoluteUri,
+                            StatusId = blobItem.Metadata.ContainsKey("Status") ? Convert.ToInt32(blobItem.Metadata["Status"]) : 0,
+                            Status = ((DocumentStatus)Convert.ToInt32(blobItem.Metadata["Status"])).ToString(),
+                            Document = document
+                        });
                     }
-                    image.Add(new AttachmentResponse()
-                    {
-                        Id = blobItem.Metadata.ContainsKey("Id") ? blobItem.Metadata["Id"] : string.Empty,
-                        Name = blobItem.Name,
-                        FileExtension = blobItem.Metadata.ContainsKey("FileExtension") ? blobItem.Metadata["FileExtension"] : string.Empty,
-                        DisplayName = blobItem.Metadata.ContainsKey("DisplayName") ? blobItem.Metadata["DisplayName"] : string.Empty,
-                        DocumentTypeId = blobItem.Metadata.ContainsKey("DocumentTypeId") ? Convert.ToInt32(blobItem.Metadata["DocumentTypeId"].ToString()) : 0,
-                        DocumentType = documentTypes.FirstOrDefault(d => d.Id == Convert.ToInt32(blobItem.Metadata["DocumentTypeId"].ToString())),
-                        Url = blobClient.Uri.AbsoluteUri,
-                        StatusId = blobItem.Metadata.ContainsKey("Status") ? Convert.ToInt32(blobItem.Metadata["Status"]) : 0,
-                        Status = ((DocumentStatus)Convert.ToInt32(blobItem.Metadata["Status"])).ToString(),
-                        Document = document
-                    }); ;
                 }
             }
             return image;
         }
+
+        public string GetDocument(string userId, string documentName)
+        {
+            string document = string.Empty;
+            var user = UserService.GetUser(null, userId);
+            if (user == null)
+                throw new Exception("User not found");
+
+            var containerName = user.Id;
+
+            var containerClient = GetContainerClient(out BlobServiceClient blobServiceClient, containerName);
+            var blobItem = containerClient.GetBlobs(BlobTraits.All, prefix: documentName).FirstOrDefault();
+            BlobClient blobClient = containerClient.GetBlobClient(documentName);
+            if (blobClient.ExistsAsync().Result)
+            {
+                document = GetDocumentBase64(blobItem, blobClient, out StreamReader sr, out MemoryStream ms);
+            }
+            return document;
+        }
+
+        private string GetDocumentBase64(BlobItem blobItem, BlobClient blobClient, out StreamReader sr, out MemoryStream ms)
+        {
+            var response = blobClient.DownloadStreamingAsync().Result;
+            sr = new StreamReader(response.Value.Content);
+            ms = new MemoryStream();
+            sr.BaseStream.CopyTo(ms);
+            var b64String = Convert.ToBase64String(ms.ToArray());
+            new FileExtensionContentTypeProvider().TryGetContentType(blobItem.Name, out string contentType);
+            var document = $"data:{contentType};base64," + b64String;
+            return document;
+        }
+
 
         public Uri GetDocumentUrl(string documentName, string userId)
         {
@@ -241,18 +273,18 @@ namespace PSSK_POC.Services
             {
                 UserService.UpdateQRCodeAndDocumentReviewedStatus(user.Id, null, false);
             }
-            
+
 
             return true;
         }
 
         private bool CheckMandatoryDocumentsApproved(string userId)
         {
-            var allDocumentsList = ListDocument(userId, false);
+            var allDocumentsList = ListDocument(userId, 0, false);
             var mandatoryDocumentsTypeIds = _configuration.GetSection("ApplicationSettings").GetSection("MandatoryDocumentTypes").Value.Split(',');
 
             // Check if all mandatory documents are uploaded
-            if(mandatoryDocumentsTypeIds.Except(allDocumentsList.Select(x => x.DocumentTypeId.ToString())).Any())
+            if (mandatoryDocumentsTypeIds.Except(allDocumentsList.Select(x => x.DocumentTypeId.ToString())).Any())
             {
                 return false;
             }

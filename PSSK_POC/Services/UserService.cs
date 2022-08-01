@@ -49,8 +49,8 @@ namespace PSSK_POC.Services
 
             GetClient();
 
-            CreateDatabaseAsync();
-            CreateContainerAsync();
+            GetDatabase();
+            GetContainer();
 
             try
             {
@@ -69,8 +69,8 @@ namespace PSSK_POC.Services
         public PersonResponse GetUser(string email, string userId, string authUserId = null)
         {
             GetClient();
-            CreateDatabaseAsync();
-            CreateContainerAsync();
+            GetDatabase();
+            GetContainer();
             var response = GetUserDetails(email, userId, authUserId);
 
             return response;
@@ -78,8 +78,8 @@ namespace PSSK_POC.Services
         public List<NationalityResponse> GetNationalities()
         {
             GetClient();
-            CreateDatabaseAsync();
-            CreateNationalityContainerAsync();
+            GetDatabase();
+            GetNationalityContainer();
             var response = GetNationalitiesList();
 
             return response;
@@ -88,8 +88,8 @@ namespace PSSK_POC.Services
         public List<PersonResponse> GetUsers()
         {
             GetClient();
-            CreateDatabaseAsync();
-            CreateContainerAsync();
+            GetDatabase();
+            GetContainer();
             var response = GetUserList();
 
             return response;
@@ -105,24 +105,22 @@ namespace PSSK_POC.Services
                 });
         }
 
-        private void CreateDatabaseAsync()
+        private void GetDatabase()
         {
             // Create a new database
-            this.database = this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId).Result;
+            this.database = this.cosmosClient.GetDatabase(databaseId);
         }
 
-        private void CreateContainerAsync()
+        private void GetContainer()
         {
             // Create a new container
-            this.container = this.database.CreateContainerIfNotExistsAsync(containerId, "/id").Result;
-            Console.WriteLine("Created Container: {0}\n", this.container.Id);
+            this.container = this.database.GetContainer(containerId);
         }
 
-        private void CreateNationalityContainerAsync()
+        private void GetNationalityContainer()
         {
             // Create a new container
-            this.container = this.database.CreateContainerIfNotExistsAsync(nationalityContainerId, "/id").Result;
-            Console.WriteLine("Created Container: {0}\n", this.container.Id);
+            this.container = this.database.GetContainer(nationalityContainerId);
         }
 
         private async Task AddNewUser(PersonRequest person1)

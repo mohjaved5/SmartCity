@@ -45,19 +45,25 @@ namespace PSSK_POC.Controllers
         }
 
         [HttpDelete("Delete")]
-        public bool DeleteDocument(string userId, string documentName)
+        public bool DeleteDocument([Required] string userId, [Required] string documentName)
         {
             return DocumentService.DeleteDocument(userId, documentName);
         }
 
         [HttpGet]
-        public List<AttachmentResponse> ListDocument(string userId)
+        public List<AttachmentResponse> ListDocument([Required] string userId, int approverTypeId)
         {
-            return DocumentService.ListDocument(userId);
+            return DocumentService.ListDocument(userId, approverTypeId, false);
+        }
+
+        [HttpGet("Base64")]
+        public string GetDocument([Required] string documentName, [Required] string userId)
+        {
+            return DocumentService.GetDocument(userId, documentName);
         }
 
         [HttpGet("Uri")]
-        public Uri GetDocumentUrl(string documentName, string userId)
+        public Uri GetDocumentUrl([Required] string documentName, [Required] string userId)
         {
             return DocumentService.GetDocumentUrl(documentName, userId);
         }
