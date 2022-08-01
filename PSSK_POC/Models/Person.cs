@@ -10,7 +10,6 @@ namespace PSSK_POC.Models
     public class PersonRequest
     {
         public string AuthUserid { get; set; }
-        [JsonProperty(PropertyName = "id")]
         [Required]
         public string FirstName { get; set; }
         [Required]

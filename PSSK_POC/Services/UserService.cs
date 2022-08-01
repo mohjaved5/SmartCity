@@ -163,9 +163,9 @@ namespace PSSK_POC.Services
             ItemResponse<PersonResponse> user = this.container.ReadItemAsync<PersonResponse>(userId, new PartitionKey(userId)).Result;
             var itemBody = user.Resource;
             // update FirstName
-            itemBody.FirstName = person.FirstName;
-            itemBody.LastName = person.LastName;
-            itemBody.DateOfBirth = person.DateOfBirth;
+            //itemBody.FirstName = person.FirstName;
+            //itemBody.LastName = person.LastName;
+            //itemBody.DateOfBirth = person.DateOfBirth;
             itemBody.Nationality = person.Nationality;
             itemBody.PassportNumber = person.PassportNumber;
             itemBody.IssueDate = person.IssueDate;
