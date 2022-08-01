@@ -30,6 +30,7 @@ namespace PSSK_POC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IronBarCode.License.LicenseKey = "IRONBARCODE.MONISJAVED.25033-BDA79C65C1-C5VMY2-DHXVUECGB674-VUTQ2QSDKTON-T3DBTMGLQMJI-NN4XQBTZPY3S-WHHYKAY7DKRR-XYSAJJ-TUP6XUWCDIOHEA-DEPLOYMENT.TRIAL-KPVODJ.TRIAL.EXPIRES.26.AUG.2022";
             services.AddScoped<AuthenticationService>();
             services.AddScoped<UserService>();
             services.AddScoped<DocumentService>();

@@ -49,5 +49,11 @@ namespace PSSK_POC.Controllers
             return UserService.GetNationalities();
         }
 
+        [HttpGet("{userId}/QRCode")]
+        public string GetQRCode(string userId)
+        {
+            return UserService.GetQRCode(userId);
+        }
+
     }
 }
