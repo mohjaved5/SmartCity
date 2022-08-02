@@ -93,9 +93,21 @@ namespace PSSK_POC.Services
             return result;
         }
 
-        public string GetLoginUrl()
+        public string GetLoginUrl(int type)
         {
-            return $"https://dev-c1w9u7zc.jp.auth0.com/dbconnections/authorize?response_type=token&client_id={clientId}&redirect_uri={redirectUrl}&scope=openid%20profile%20email&state=STATE";
+            string connection = type switch
+            {
+                1 => "TestConnection",
+                2 => "google-auth2",
+                3 => "facebook",
+                4 => "siwe",
+                5 => "windowslive",
+                _ => string.Empty,
+            };
+            var url = $"https://dev-c1w9u7zc.jp.auth0.com/dbconnections/authorize?response_type=token" 
+                + (!string.IsNullOrEmpty(connection) ? $"&connection={connection}" : string.Empty) 
+                + $"&client_id={clientId}&redirect_uri={redirectUrl}&scope=openid%20profile%20email&state=STATE";
+            return url;
         }
 
         public string GetLogoutUrl()

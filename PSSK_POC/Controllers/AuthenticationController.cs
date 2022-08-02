@@ -43,9 +43,9 @@ namespace PSSK_POC.Controllers
         }
 
         [HttpGet("Login")]
-        public ActionResult Login()
+        public ActionResult Login(int type)
         {
-            string response = AuthenticationService.GetLoginUrl();
+            string response = AuthenticationService.GetLoginUrl(type);
             return new OkObjectResult(response);
         }
         
