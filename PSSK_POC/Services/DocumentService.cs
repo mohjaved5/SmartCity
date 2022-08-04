@@ -5,12 +5,15 @@ using Azure.Storage.Sas;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using PSSK_POC.Contracts;
+using PSSK_POC.Helpers;
 using PSSK_POC.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using static PSSK_POC.Common.Enums;
 
@@ -263,8 +266,8 @@ namespace PSSK_POC.Services
             // Generate QR Code for user if all documents are approved
             if (CheckMandatoryDocumentsApproved(review.UserId))
             {
-                var userDetailsJson = Newtonsoft.Json.JsonConvert.SerializeObject(user);
-                var qrCodeImage = _qRCodeService.GetQRCode(userDetailsJson);
+                var qrCodeUri = CreateQRCodeUri(user);
+                var qrCodeImage = _qRCodeService.GetQRCode(qrCodeUri);
 
                 // update the qr code image for user
                 UserService.UpdateQRCodeAndDocumentReviewedStatus(user.Id, qrCodeImage, true);
@@ -294,6 +297,23 @@ namespace PSSK_POC.Services
                 return false;
 
             return true;
+        }
+
+        private string CreateQRCodeUri(PersonResponse user)
+        {
+            var clientSecret = _configuration.GetSection("ApplicationSettings").GetSection("ClientSecret").Value;
+            var qrCodeUri = _configuration.GetSection("ApplicationSettings").GetSection("QRCodeValidationAPI").Value;
+            var baseApiUrl = _configuration.GetSection("ApplicationSettings").GetSection("APIBaseUrl").Value;
+            var data = new QRCodeData
+            {
+                userId = user.Id,
+                email = user.Email,
+            };
+            var symmetricCryptoKey = _configuration.GetSection("ApplicationSettings").GetSection("SymmetricCryptoKey").Value;
+            var encryptedData = CryptographyHelper.EncryptString(symmetricCryptoKey, JsonConvert.SerializeObject(data));
+            var encryptedClientSecret = CryptographyHelper.EncryptString(symmetricCryptoKey, clientSecret);
+            qrCodeUri = String.Format(qrCodeUri, baseApiUrl, WebUtility.UrlEncode(encryptedClientSecret), WebUtility.UrlEncode(encryptedData));
+            return qrCodeUri;
         }
 
         private static Uri GetServiceSasUriForBlob(BlobClient blobClient, string storedPolicyName = null)

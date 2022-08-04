@@ -21,6 +21,8 @@ namespace PSSK_POC
              .ConfigureAppConfiguration((hostContext, config) =>
              {
                  config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                 config.AddJsonFile("environment.json", optional: true, reloadOnChange: true);
+                 config.AddJsonFile("appkeys.json", optional: true, reloadOnChange: true);
              })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
