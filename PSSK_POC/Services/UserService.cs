@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using PSSK_POC.Helpers;
 using PSSK_POC.Models;
 using System;
 using System.Collections.Generic;
@@ -21,6 +24,8 @@ namespace PSSK_POC.Services
         // The container we will create.
         private Container container;
 
+        private IConfiguration _configuration;
+
         // The name of the database and container we will create
         private readonly string databaseId = "pssk";
         private readonly string containerId = "users";
@@ -30,10 +35,11 @@ namespace PSSK_POC.Services
         public AuthenticationService AuthenticationService { get; }
         public IMapper Mapper { get; }
 
-        public UserService(AuthenticationService authenticationService, IMapper mapper)
+        public UserService(AuthenticationService authenticationService, IMapper mapper, IConfiguration configuration)
         {
             AuthenticationService = authenticationService;
             Mapper = mapper;
+            _configuration = configuration;
         }
         public bool CreateUser(PersonRequest person)
         {
@@ -104,6 +110,29 @@ namespace PSSK_POC.Services
             GetDatabase();
             GetContainer();
             var response = GetUserList();
+
+            return response;
+        }
+
+        public bool CheckQRCodeValid(string encryptedClientSecret, string encryptedQRCodeData)
+        {
+            var clientSecretFromSettings = _configuration.GetSection("ApplicationSettings").GetSection("ClientSecret").Value;
+            var decryptedClientSecret = DecryptClientSecret(encryptedClientSecret);
+            if (decryptedClientSecret.Equals(clientSecretFromSettings))
+            {
+                var qrCodeData = DecryptQRCodeData(encryptedQRCodeData);
+                return CheckIfQRCodeUserExists(qrCodeData.userId, qrCodeData.email);
+            }
+            else
+                return false;
+        }
+
+        public bool CheckIfQRCodeUserExists(string userId, string email)
+        {
+            GetClient();
+            GetDatabase();
+            GetContainer();
+            var response = CheckUserExists(userId, email);
 
             return response;
         }
@@ -224,6 +253,21 @@ namespace PSSK_POC.Services
             return families.FirstOrDefault();
         }
 
+        private QRCodeData DecryptQRCodeData(string encryptedData)
+        {
+           var key = _configuration.GetSection("ApplicationSettings").GetSection("SymmetricCryptoKey").Value;
+            var decryptedQRCodeData = CryptographyHelper.DecryptString(key, encryptedData);
+            var qrCodeData = JsonConvert.DeserializeObject<QRCodeData>(decryptedQRCodeData);
+            return qrCodeData;
+        }
+
+        private string DecryptClientSecret(string encryptedClientSecret)
+        {
+            var key = _configuration.GetSection("ApplicationSettings").GetSection("SymmetricCryptoKey").Value;
+            var decryptedClientSecret = CryptographyHelper.DecryptString(key, encryptedClientSecret);
+            return decryptedClientSecret;
+        }
+
         private List<PersonResponse> GetUserList()
         {
             var sqlQueryText = string.Empty;
@@ -243,6 +287,19 @@ namespace PSSK_POC.Services
                 }
             }
             return families;
+        }
+
+        private bool CheckUserExists(string userId, string email)
+        {
+            var sqlQueryText = string.Empty;
+            sqlQueryText = $"SELECT * FROM items i where i.email ='"+ email+"' and i.id ='"+ userId+"'";
+
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+            using FeedIterator<PersonResponse> queryResultSetIterator = this.container.GetItemQueryIterator<PersonResponse>(queryDefinition);
+            if (queryResultSetIterator.HasMoreResults)
+                return true;
+            else
+                return false;
         }
 
         private List<NationalityResponse> GetNationalitiesList()
