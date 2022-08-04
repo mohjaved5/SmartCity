@@ -98,7 +98,7 @@ namespace PSSK_POC.Services
             string connection = type switch
             {
                 1 => "TestConnection",
-                2 => "google-auth2",
+                2 => "google-oauth2",
                 3 => "facebook",
                 4 => "siwe",
                 5 => "windowslive",
